@@ -17,68 +17,104 @@ def analyze(results, roster, score):
     :Time complexity:
     :Aux Space complexity:
     """
-    # Call function to sort matches in required order
-    sort(results, roster)
-    print('-------------')
-    print("Check: all")
+
+    resultsB = []
     for i in results:
-        print(i)
-    print('-------------')
+        resultsB.append(i)
+
+    # Add opposites to mix
+    opposites = addOpposites(results)
+
+    # Call function to sort matches in required order
+    sort(opposites, roster)
+
+    temp = sameScoreDuplicates(opposites, roster)
+
+    uniques = []
+    for i in range(temp[1]):
+        uniques.append(temp[0][i])
+
+
     # Get matches with at least the searched score
-    searchedMatches = getSearchedMatches(results, score)
+    searchedMatches = getSearchedMatches(uniques, roster, score)
+
+
 
     # Get the top ten matches for this data set
-    topTenMatches = getTopTenMatches(results, roster)
-
-    topTenMatches.append(searchedMatches)
-    # Testing
-    print('-------------')
-    print("Check: topTenMatches")
-    for i in topTenMatches:
-        print(i)
-    print('-------------')
-    return topTenMatches
+    topTenMatches = getTopTenMatches(uniques, roster)
 
 
-# def addOpposites():
-#     for match in results:
-#         if match[2] >= score:
-#             searchedMatches.append(match)
-#         elif match[2] <= 100 - score:
-#             searchedMatches.append(getRotatedMatch(match))
-#
-
-def removeDuplicates(array, roster):
-    # for searched matches
-    j = 1
-    for i in range(2, len(array)):
-        if isTeamSame(array[i][0], array[i - 1][0], roster) or isTeamSame(array[i][1], array[i - 1][1], roster):
-            array[j + 1] = array[i]
-            j = j + 1
-            # Unique : 1....j
-            # Duplicate : j + 1....n
+    return [topTenMatches, searchedMatches]
 
 
 def getTopTenMatches(results, roster):
     topTenMatches = []
+
+    # Add opposites to mix
+    opposites = addOpposites(results)
+
+    # Call function to sort matches in required order
+    sort(opposites, roster)
+
+    temp = sameScoreDuplicates(opposites, roster)
+    uniques = []
+    for i in range(temp[1]):
+        uniques.append(temp[0][i])
+
     # TODO: add 85-100=15 scores
-    # for i in range(len(results) - 1, len(results) - 11, -1):
-    #     # TODO: Omit same teams same score
-    #     if not isTeamSame(results[i], roster):
-    #         topTenMatches.append(results[i])
+    i = 0
+    #while i<10:
+
+    for i in range(len(results) - 1, len(results) - 11, -1):
+        topTenMatches.append(results[i])
     return topTenMatches
 
 
-def getSearchedMatches(results, score):
+def getSearchedMatches(results, roster, score):
     searchedMatches = []
 
+    # Call function to sort matches in required order
+    sort(results, roster)
+
+    temp = sameScoreDuplicates(results, roster)
+    uniques = []
+    for i in range(temp[1]):
+        uniques.append(temp[0][i])
+
     for match in results:
-        # TODO: Check if this versus has been p
+        # TODO: Check same team different match
         if match[2] >= score:
             searchedMatches.append(match)
-        elif match[2] <= 100 - score:
-            searchedMatches.append(getRotatedMatch(match))
+        # elif match[2] <= 100 - score:
+        #     searchedMatches.append(getRotatedMatch(match))
     return searchedMatches
+
+def addOpposites(array):
+    opposites = []
+    for match in array:
+        # print(match)
+        # print(getRotatedMatch(match))
+        opposites.append(getRotatedMatch(match))
+
+    return opposites
+
+
+def sameScoreDuplicates(array, roster):
+    j = 0
+    for i in range(1, len(array)):
+        if not isTeamSame(array[i][0], array[i - 1][0], roster) or not isTeamSame(array[i][1], array[i - 1][1], roster) \
+                or array[i][2] != array[i - 1][2]:
+            array[j+1] = array[i]
+            j += 1
+    # output = []
+    # for i in range(j):
+    #     output.append(array[i])
+    #
+    # for i in output:
+    #     print(i)
+    return [array, j]
+
+
 
 
 def sort(array, roster):
@@ -186,10 +222,10 @@ if __name__ == '__main__':
                ['DED', 'EDD', 83], ['ABC', 'CAB', 54], ['AAB', 'BDB', 15],
                ['BBE', 'EAD', 28], ['ACD', 'DCD', 50], ['DEB', 'CAA', 21],
                ['EBE', 'AAC', 24], ['EBD', 'BCD', 48]]
-    analyze(results, 5, 70)
+    print(analyze(results, 5, 70))
 
     print(isTeamSame("ECA", "ACE", 5))
-    print(isTeamSame("ECb", "ACE", 5))
+    print(isTeamSame("ECB", "ACE", 5))
 
     # import doctest
     #
