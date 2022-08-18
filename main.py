@@ -17,66 +17,46 @@ def analyze(results, roster, score):
     :Time complexity:
     :Aux Space complexity:
     """
-
-    resultsB = []
-    for each in results:
-        resultsB.append(each)
-
-    # # Add opposites to mix
-    # opposites = addOpposites(results)
-    #
+    # Add opposites to mix
+    addOpposites(results)
     # # Call function to sort matches in required order
-    # sort(opposites, roster)
-    #
-    # temp = sameScoreDuplicates(opposites, roster)
-    #
-    # uniques = []
-    # for i in range(temp[1]):
-    #     uniques.append(temp[0][i])
+    sort(results, roster)
+    # Remove duplicates so all are unique
+    uniques = sameScoreDuplicates(results, roster)
 
     # Get matches with at least the searched score
-    searchedMatches = getSearchedMatches(resultsB, roster, score)
+    searchedMatches = getSearchedMatches(uniques, score)
 
     # Get the top ten matches for this data set
-    topTenMatches = getTopTenMatches(results, roster)
+    topTenMatches = getTopTenMatches(uniques, roster)
 
     return [topTenMatches, searchedMatches]
 
 def getTopTenMatches(array, roster):
     topTenMatches = []
-    print(len(array))
-    # Add opposites to mix
-    addOpposites(array)
-    # # Call function to sort matches in required order
-    sort(array, roster)
-    # Remove duplicates so all are unique
-    uniques = sameScoreDuplicates(array, roster)
 
-    for i in range(len(uniques) - 1, len(uniques) - 11, -1):
-        topTenMatches.append(uniques[i])
+    for i in range(len(array) - 1, len(array) - 11, -1):
+        topTenMatches.append(array[i])
 
     sortTeam(topTenMatches)
 
     return topTenMatches
 
 
-def getSearchedMatches(array, roster, score):
+def getSearchedMatches(array, score):
+    matchFound = False
     searchedMatches = []
-    # Call function to sort matches in required order
-    sort(array, roster)
-    # Remove duplicates so all are unique
-    uniques = sameScoreDuplicates(array, roster)
 
-    for match in uniques:
-        # TODO: Check same team different match
-        if match[2] >= score:
+    for match in array:
+        if match[2] >= score and not matchFound:
+            score = match[2]
+            matchFound = True
             searchedMatches.append(match)
-        elif match[2] <= 100 - score:
-            searchedMatches.append(getRotatedMatch(match))
+        elif match[2] == score and matchFound:
+            searchedMatches.append(match)
 
     sortTeam(searchedMatches)
     return searchedMatches
-
 
 def addOpposites(array):
     # opposites = []
@@ -96,7 +76,7 @@ def sameScoreDuplicates(array, roster):
             array[j + 1] = array[i]
             j += 1
     output = []
-    for i in range(j):
+    for i in range(j+1):
         #print(array[i])
         output.append(array[i])
     #print(len(output))
@@ -263,7 +243,7 @@ if __name__ == '__main__':
      ['ABB', 'BBB', 68], ['BAB', 'BBB', 52]]
 
     out = analyze(results, 2, 63)
-
+    print("------------")
     for i in out[0]:
         print(i)
     print(out[1])
