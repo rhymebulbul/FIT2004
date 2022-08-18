@@ -32,18 +32,18 @@ def analyse(results, roster, score):
 
     ### Your code here ###
     """
-        Basic function to consider opposite matches, sort data, remove duplicates
-        and then call appropriate functions to retrieve top ten matches and searched matches
-        :param results: List of lists, containing each match
-        :param roster: Number length of character set teams are formed of
-        :param score: The minimum score to look for in a match
-        :return: List of lists containing top ten matches and searched matches
-        :Time complexity: O(NM)
-        :Aux Space complexity: O(NM)
-        """
+    Basic function to consider opposite matches, sort data, remove duplicates
+    and then call appropriate functions to retrieve top ten matches and searched matches
+    :param results: List of lists, containing each match
+    :param roster: Number length of character set teams are formed of
+    :param score: The minimum score to look for in a match
+    :return: List of lists containing top ten matches and searched matches
+    :Time complexity: O(NM)
+    :Aux Space complexity: O(NM)
+    """
     # Add opposites to mix
     addOpposites(results)
-    # # Call function to sort matches in required order
+    # # Call functions to sort matches in required order
     sort(results, roster)
     # Remove duplicates so all are unique
     uniques = sameScoreDuplicates(results, roster)
@@ -52,7 +52,6 @@ def analyse(results, roster, score):
     # Get the top ten matches for this data set
     topTenMatches = getTopTenMatches(uniques)
     return [topTenMatches, searchedMatches]
-
 
 def getTopTenMatches(array):
     """
@@ -91,16 +90,16 @@ def getSearchedMatches(array, score):
     searchedMatches = []
     # Iterate over array until the score or greater is found
     for j in range(len(array)):
-        if array[j][2] >= score and not matchFound:  # Once score or greater is found
-            score = array[j][2]  # set that to target score
-            matchFound = True  # stop looking for at least score, and look for exact score only
-            searchedMatches.append(array[j])  # add element to list
-        elif array[j][2] == score and matchFound:  # Only look for exact score
-            searchedMatches.append(array[j])  # add element to list
+        if array[j][2] >= score and not matchFound: # Once score or greater is found
+            score = array[j][2] # set that to target score
+            matchFound = True # stop looking for at least score, and look for exact score only
+            searchedMatches.append(array[j]) # add element to list
+        elif array[j][2] == score and matchFound: # Only look for exact score
+            searchedMatches.append(array[j]) # add element to list
+    searchedMatches.reverse() # Reverse order of list as appended in reverse
     # Sorts each team name into lexicographical order
     sortTeam(searchedMatches)
     return searchedMatches
-
 
 def addOpposites(array):
     """
@@ -115,7 +114,6 @@ def addOpposites(array):
     """
     for j in range(len(array)):
         array.append(getRotatedMatch(array[j]))
-
 
 def sameScoreDuplicates(array, roster):
     """
@@ -133,15 +131,14 @@ def sameScoreDuplicates(array, roster):
     # Iterate over matches in results array and compare team and score with previous ones
     for i in range(1, len(array)):
         if not isTeamSame(array[i][0], array[i - 1][0], roster) or not isTeamSame(array[i][1], array[i - 1][1], roster) \
-                or array[i][2] != array[i - 1][2]:  # copy over match if unique
-            array[j + 1] = array[i]  # Uniques[0...j], Duplicates[j+1...n]
+                or array[i][2] != array[i - 1][2]: # copy over match if unique
+            array[j + 1] = array[i] # Uniques[0...j], Duplicates[j+1...n]
             j += 1
     # Create new array with uniques only
     output = []
-    for i in range(j + 1):  # Only copy upto j, which are unique elements
+    for i in range(j+1): # Only copy upto j, which are unique elements
         output.append(array[i])
     return output
-
 
 def sort(array, roster):
     """
@@ -162,7 +159,6 @@ def sort(array, roster):
     # Now sort in order of scores with inplace sort
     radixSort(array)
 
-
 def countingSort(array, place):
     """
     Implements counting sort. Counts number of occurence of each number
@@ -174,12 +170,12 @@ def countingSort(array, place):
     :Time complexity: O(M)
     :Aux space complexity: O(M)
     """
-    size = len(array)  # Size of array
+    size = len(array) # Size of array
     output = [0] * size  # Prepare empty array of same size for output
-    count = [0] * 10  # Initialize all elements of counting array to zero
+    count = [0] * 10 # Initialize all elements of counting array to zero
     # Iterate over array
     for i in range(0, size):
-        index = array[i][2] // place  # get place of element
+        index = array[i][2] // place # get place of element
         count[index % 10] += 1  # Increment count of that integer
     # Make count array represent cumulative count
     for i in range(1, 10):
@@ -187,14 +183,13 @@ def countingSort(array, place):
     # Write elements in sorted order
     i = size - 1
     while i >= 0:
-        index = array[i][2] // place  # get place of element
+        index = array[i][2] // place # get place of element
         output[count[index % 10] - 1] = array[i]  # Store each element at index denoted by count array
-        count[index % 10] -= 1  # Decrement count for element written
+        count[index % 10] -= 1 # Decrement count for element written
         i -= 1
     # Rewrite output to original array
     for i in range(0, size):
         array[i] = output[i]
-
 
 def radixSort(array):
     """
@@ -206,13 +201,12 @@ def radixSort(array):
     :Time complexity: O(M)
     :Aux space complexity: O(M)
     """
-    max_element = 100  # Largest element in list, score of 100
+    max_element = 100 # Largest element in list, score of 100
     place = 1
     # Continue to call counting sort on each place of the numbers until sorted
     while max_element // place > 0:
         countingSort(array, place)
-        place *= 10  # Increment place to the next 10s
-
+        place *= 10 # Increment place to the next 10s
 
 def countingSortRoster(array, roster, place, team):
     """
@@ -227,27 +221,26 @@ def countingSortRoster(array, roster, place, team):
     :Time complexity: O(M)
     :Aux space complexity: O(M)
     """
-    size = len(array)  # Size of array
+    size = len(array) # Size of array
     output = [0] * size  # Prepare empty array of same size for output
-    count = [0] * roster  # Initialize all elements of counting array to zero
+    count = [0] * roster # Initialize all elements of counting array to zero
     # Iterate over array
     for i in range(0, size):
-        index = ord(array[i][team][place])  # get place of element
-        count[index % roster] += 1  # Increment count of that integer
+        index = ord(array[i][team][place]) # get place of element
+        count[index % roster] += 1 # Increment count of that integer
     # Make count array represent cumulative count
     for i in range(1, roster):
         count[i] += count[i - 1]
     # Write elements in sorted order
     i = size - 1
     while i >= 0:
-        index = ord(array[i][team][place])  # get place of element
-        output[count[index % roster] - 1] = array[i]  # Store each element at index denoted by count array
-        count[index % roster] -= 1  # Decrement count for element written
+        index = ord(array[i][team][place]) # get place of element
+        output[count[index % roster] - 1] = array[i] # Store each element at index denoted by count array
+        count[index % roster] -= 1 # Decrement count for element written
         i -= 1
     # Rewrite output to original array
     for i in range(0, size):
         array[i] = output[i]
-
 
 def radixSortRoster(array, roster, team):
     """
@@ -265,8 +258,7 @@ def radixSortRoster(array, roster, team):
     # Continue to call counting sort on each place of the numbers until sorted
     while place >= 0:
         countingSortRoster(array, roster, place, team)
-        place -= 1  # Decrement place to the next
-
+        place -= 1 # Decrement place to the next
 
 def countingSortTeam(array, place):
     """
@@ -279,27 +271,26 @@ def countingSortTeam(array, place):
     :Time complexity: O(M)
     :Aux space complexity: O(M)
     """
-    size = len(array)  # Size of array
-    output = [0] * size  # Prepare empty array of same size for output
-    count = [0] * 10  # Initialize all elements of counting array to zero
+    size = len(array) # Size of array
+    output = [0] * size # Prepare empty array of same size for output
+    count = [0] * 10 # Initialize all elements of counting array to zero
     # Iterate over array
     for i in range(0, size):
-        index = array[i] // place  # get place of element
-        count[index % 10] += 1  # Increment count of that integer
+        index = array[i] // place # get place of element
+        count[index % 10] += 1 # Increment count of that integer
     # Make count array represent cumulative count
     for i in range(1, 10):
         count[i] += count[i - 1]
     # Write elements in sorted order
     i = size - 1
     while i >= 0:
-        index = array[i] // place  # get place of element
-        output[count[index % 10] - 1] = array[i]  # Store each element at index denoted by count array
-        count[index % 10] -= 1  # Decrement count for element written
+        index = array[i] // place # get place of element
+        output[count[index % 10] - 1] = array[i] # Store each element at index denoted by count array
+        count[index % 10] -= 1 # Decrement count for element written
         i -= 1
     # Rewrite output to original array
     for i in range(0, size):
         array[i] = (output[i])
-
 
 def radixSortTeam(array):
     """
@@ -311,13 +302,12 @@ def radixSortTeam(array):
     :Time complexity: O(M)
     :Aux space complexity: O(M)
     """
-    max_element = 122  # Largest element in list, ASCII value of z
+    max_element = 122   # Largest element in list, ASCII value of z
     place = 1
     # Continue to call counting sort on each place of the numbers until sorted
     while max_element // place > 0:
         countingSortTeam(array, place)
-        place *= 10  # Increment place to the next 10s
-
+        place *= 10 # Increment place to the next 10s
 
 def sortByChar(team):
     """
@@ -340,7 +330,6 @@ def sortByChar(team):
     # Return a string from joining sorted characters in list
     return ''.join(converted)
 
-
 def sortTeam(array):
     """
     Sorts individual team names in alpahabetical order
@@ -355,7 +344,6 @@ def sortTeam(array):
         array[i][0] = sortByChar(array[i][0])
         array[i][1] = sortByChar(array[i][1])
 
-
 def getRotatedMatch(match):
     """
     Gets the match score the other way around for the opposite team
@@ -368,7 +356,6 @@ def getRotatedMatch(match):
     :Aux space complexity: O(1)
     """
     return [match[1], match[0], 100 - match[2]]
-
 
 def isTeamSame(a, b, roster):
     """

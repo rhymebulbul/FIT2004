@@ -20,7 +20,7 @@ def analyze(results, roster, score):
     """
     # Add opposites to mix
     addOpposites(results)
-    # # Call function to sort matches in required order
+    # # Call functions to sort matches in required order
     sort(results, roster)
     # Remove duplicates so all are unique
     uniques = sameScoreDuplicates(results, roster)
@@ -73,6 +73,7 @@ def getSearchedMatches(array, score):
             searchedMatches.append(array[j]) # add element to list
         elif array[j][2] == score and matchFound: # Only look for exact score
             searchedMatches.append(array[j]) # add element to list
+    searchedMatches.reverse() # Reverse order of list as appended in reverse
     # Sorts each team name into lexicographical order
     sortTeam(searchedMatches)
     return searchedMatches
