@@ -19,84 +19,73 @@ def analyze(results, roster, score):
     """
 
     resultsB = []
-    for i in results:
-        resultsB.append(i)
+    for each in results:
+        resultsB.append(each)
 
-    # Add opposites to mix
-    opposites = addOpposites(results)
-
-    # Call function to sort matches in required order
-    sort(opposites, roster)
-
-    temp = sameScoreDuplicates(opposites, roster)
-
-    uniques = []
-    for i in range(temp[1]):
-        uniques.append(temp[0][i])
-
+    # # Add opposites to mix
+    # opposites = addOpposites(results)
+    #
+    # # Call function to sort matches in required order
+    # sort(opposites, roster)
+    #
+    # temp = sameScoreDuplicates(opposites, roster)
+    #
+    # uniques = []
+    # for i in range(temp[1]):
+    #     uniques.append(temp[0][i])
 
     # Get matches with at least the searched score
-    searchedMatches = getSearchedMatches(uniques, roster, score)
-
-
+    searchedMatches = getSearchedMatches(resultsB, roster, score)
 
     # Get the top ten matches for this data set
-    topTenMatches = getTopTenMatches(uniques, roster)
-
+    topTenMatches = getTopTenMatches(results, roster)
 
     return [topTenMatches, searchedMatches]
 
-
-def getTopTenMatches(results, roster):
+def getTopTenMatches(array, roster):
     topTenMatches = []
-
+    print(len(array))
     # Add opposites to mix
-    opposites = addOpposites(results)
+    addOpposites(array)
+    # # Call function to sort matches in required order
+    sort(array, roster)
+    # Remove duplicates so all are unique
+    uniques = sameScoreDuplicates(array, roster)
 
-    # Call function to sort matches in required order
-    sort(opposites, roster)
+    for i in range(len(uniques) - 1, len(uniques) - 11, -1):
+        topTenMatches.append(uniques[i])
 
-    temp = sameScoreDuplicates(opposites, roster)
-    uniques = []
-    for i in range(temp[1]):
-        uniques.append(temp[0][i])
+    sortTeam(topTenMatches)
 
-    # TODO: add 85-100=15 scores
-    i = 0
-    #while i<10:
-
-    for i in range(len(results) - 1, len(results) - 11, -1):
-        topTenMatches.append(results[i])
     return topTenMatches
 
 
-def getSearchedMatches(results, roster, score):
+def getSearchedMatches(array, roster, score):
     searchedMatches = []
-
     # Call function to sort matches in required order
-    sort(results, roster)
+    sort(array, roster)
+    # Remove duplicates so all are unique
+    uniques = sameScoreDuplicates(array, roster)
 
-    temp = sameScoreDuplicates(results, roster)
-    uniques = []
-    for i in range(temp[1]):
-        uniques.append(temp[0][i])
-
-    for match in results:
+    for match in uniques:
         # TODO: Check same team different match
         if match[2] >= score:
             searchedMatches.append(match)
-        # elif match[2] <= 100 - score:
-        #     searchedMatches.append(getRotatedMatch(match))
+        elif match[2] <= 100 - score:
+            searchedMatches.append(getRotatedMatch(match))
+
+    sortTeam(searchedMatches)
     return searchedMatches
 
-def addOpposites(array):
-    opposites = []
-    for match in array:
-        # print(match)
-        # print(getRotatedMatch(match))
-        opposites.append(getRotatedMatch(match))
 
-    return opposites
+def addOpposites(array):
+    # opposites = []
+    for i in range(len(array)):
+        # array.append(match)
+        # print(getRotatedMatch(array[i]))
+        array.append(getRotatedMatch(array[i]))
+
+    # return array
 
 
 def sameScoreDuplicates(array, roster):
@@ -104,17 +93,14 @@ def sameScoreDuplicates(array, roster):
     for i in range(1, len(array)):
         if not isTeamSame(array[i][0], array[i - 1][0], roster) or not isTeamSame(array[i][1], array[i - 1][1], roster) \
                 or array[i][2] != array[i - 1][2]:
-            array[j+1] = array[i]
+            array[j + 1] = array[i]
             j += 1
-    # output = []
-    # for i in range(j):
-    #     output.append(array[i])
-    #
-    # for i in output:
-    #     print(i)
-    return [array, j]
-
-
+    output = []
+    for i in range(j):
+        #print(array[i])
+        output.append(array[i])
+    #print(len(output))
+    return output
 
 
 def sort(array, roster):
@@ -148,7 +134,6 @@ def countingSort(array, place):
     for i in range(0, size):
         array[i] = output[i]
 
-
 def radixSort(array):
     max_element = 100
 
@@ -156,7 +141,6 @@ def radixSort(array):
     while max_element // place > 0:
         countingSort(array, place)
         place *= 10
-
 
 def countingSortRoster(array, roster, place, team):
     size = len(array)
@@ -180,12 +164,59 @@ def countingSortRoster(array, roster, place, team):
     for i in range(0, size):
         array[i] = output[i]
 
-
 def radixSortRoster(array, roster, team):
     place = len(array[0][0]) - 1
     while place >= 0:
         countingSortRoster(array, roster, place, team)
         place -= 1
+
+def countingSortTeam(array, place):
+    size = len(array)
+    output = [0] * size
+    count = [0] * 10
+
+    for i in range(0, size):
+        index = array[i] // place
+        count[index % 10] += 1
+
+    for i in range(1, 10):
+        count[i] += count[i - 1]
+
+    i = size - 1
+    while i >= 0:
+        index = array[i] // place
+        output[count[index % 10] - 1] = array[i]
+        count[index % 10] -= 1
+        i -= 1
+
+    for i in range(0, size):
+        array[i] = (output[i])
+
+def radixSortTeam(array):
+    max_element = 100
+
+    place = 1
+    while max_element // place > 0:
+        countingSortTeam(array, place)
+        place *= 10
+
+def sortByChar(team):
+    converted = []
+    for i in range(len(team)):
+        converted.append(ord(team[i]))
+
+    radixSortTeam(converted)
+
+    for i in range(len(converted)):
+        converted[i] = (chr(converted[i]))
+
+    return ''.join(converted)
+
+def sortTeam(array):
+    for i in range(len(array)):
+
+        array[i][0] = sortByChar(array[i][0])
+        array[i][1] = sortByChar(array[i][1])
 
 
 def getRotatedMatch(match):
@@ -222,11 +253,17 @@ if __name__ == '__main__':
                ['DED', 'EDD', 83], ['ABC', 'CAB', 54], ['AAB', 'BDB', 15],
                ['BBE', 'EAD', 28], ['ACD', 'DCD', 50], ['DEB', 'CAA', 21],
                ['EBE', 'AAC', 24], ['EBD', 'BCD', 48]]
-    print(analyze(results, 5, 70))
 
-    print(isTeamSame("ECA", "ACE", 5))
-    print(isTeamSame("ECB", "ACE", 5))
+    results = [['AAB', 'AAB', 35], ['AAB', 'BBA', 49], ['BAB', 'BAB', 42],
+     ['AAA', 'AAA', 38], ['BAB', 'BAB', 36], ['BAB', 'BAB', 36],
+     ['ABA', 'BBA', 57], ['BBB', 'BBA', 32], ['BBA', 'BBB', 49],
+     ['BBA', 'ABB', 55], ['AAB', 'AAA', 58], ['ABA', 'AAA', 46],
+     ['ABA', 'ABB', 44], ['BBB', 'BAB', 32], ['AAA', 'AAB', 36],
+     ['ABA', 'BBB', 48], ['BBB', 'ABA', 33], ['AAB', 'BBA', 30],
+     ['ABB', 'BBB', 68], ['BAB', 'BBB', 52]]
 
-    # import doctest
-    #
-    # doctest.testmod(verbose=True)
+    out = analyze(results, 2, 63)
+
+    for i in out[0]:
+        print(i)
+    print(out[1])
