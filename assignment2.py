@@ -39,15 +39,18 @@ class RoadGraph:
         self.V = self.get_vertices(roads)  # Total number of locations on graph
         self.graph = [None] * self.V  # Initialize graph to None
         self.cafes_visited = 0  # Count for number of cafes visited
-        self.cafes_sorted = self.sort_cafes(cafes)  # Cafe wait times sorted by location
-
-        for i in range(len(roads)):  # Iterate over all roads in graph
-            travel_time = roads[i][2]  # Get travel time for edge/road
-            src_cafe = self.cafes_sorted[roads[i][0]]  # Check wait time for source location café
-            dest_cafe = self.cafes_sorted[roads[i][1]]  # Check wait time for destination location cafe
-            self.add_edge(roads[i][0], roads[i][1], travel_time + src_cafe, 1)  # Add edge stopping at source
-            self.add_edge(roads[i][0], roads[i][1], travel_time + dest_cafe, 2)  # Add edge stopping at destination
-            self.add_edge(roads[i][0], roads[i][1], travel_time, 0)  # Add edge skipping all coffee altogether
+        self.empty = False  # whether input data is empty
+        if len(roads) > 0 and len(cafes) > 0:  # Check if input data is empty
+            self.cafes_sorted = self.sort_cafes(cafes)  # Cafe wait times sorted by location
+            for i in range(len(roads)):  # Iterate over all roads in graph
+                travel_time = roads[i][2]  # Get travel time for edge/road
+                src_cafe = self.cafes_sorted[roads[i][0]]  # Check wait time for source location café
+                dest_cafe = self.cafes_sorted[roads[i][1]]  # Check wait time for destination location cafe
+                self.add_edge(roads[i][0], roads[i][1], travel_time + src_cafe, 1)  # Add edge stopping at source
+                self.add_edge(roads[i][0], roads[i][1], travel_time + dest_cafe, 2)  # Add edge stopping at destination
+                self.add_edge(roads[i][0], roads[i][1], travel_time, 0)  # Add edge skipping all coffee altogether
+        else:  #
+            self.empty = True
 
     def get_vertices(self, roads):
         """
@@ -225,23 +228,15 @@ class RoadGraph:
         :Time complexity: O(Elog(V)), where 'V' is number of vertices and 'E' is number of edges in graph
         :Aux space complexity: O(V + E), where 'V' is number of vertices and 'E' is number of edges in graph
         """
-        self.route = [start, end]  # Route holding start and end
-        prev = self.route  # Copy of route
+        if self.empty:
+            return None
+
+        self.route = None  # Route holding start and end
+        prev = [start, end]  # Copy of route
         self.route = self.dijkstra(start, end)  # run dijkstra's algorithm
-        # temp = self.graph[self.route[0]]
-        # while len(self.route) == 1:
-        #     # if start == end:  # Re-run same start and end locations
-        #     print("equial: ")
-        #     print(self.route)
-        #
-        #     print(start)
-        #     print(temp.points_to)
-        #     self.delete_edge(start, temp.points_to)  # Delete edge
-        #     self.route = self.dijkstra(start, end)  # Re-run dijkstra's algorithm
-        #     temp.next
 
         while self.cafes_visited < 1:  # Re-run until at least one cafe is found
-            if len(self.route) < len(prev):  # If the path found is even shorter, a cycle is needed.
+            if len(self.route) < 2:  # If the path found is even shorter, a cycle is needed.
                 self.delete_edge(prev[1], prev[0])  # Delete edge from path
                 self.route = self.dijkstra(end, start)  # Re-run dijkstra's algorithm
                 temp = []  # Holds part of cyclic path
@@ -251,9 +246,10 @@ class RoadGraph:
                     temp.append(self.route[i])
                 for i in range(len(prev)):  # Add last run back to destination
                     temp.append(prev[i])
-                # if self.cycle(self.route):
-                #     return None
+                if self.cycle(self.route):
+                    return None
                 return temp  # Return the path
+
             else:  # Continue otherwise
                 self.delete_edge(self.route[0], self.route[1])  # Delete edge
                 prev = self.route  # Update prev variable
@@ -262,11 +258,6 @@ class RoadGraph:
                     self.delete_edge(self.route[0], self.route[1])  # Delete edge
                     prev = self.route  # Update prev variable
                     self.route = self.dijkstra(start, end)  # Re-run dijkstra's algorithm
-                #elif len(self.route) == 1:
-
-
-        if self.cycle(self.route):
-            return None
         return self.route
 
     def cycle(self, path):
@@ -308,6 +299,7 @@ class AdjacencyNode:
         self.travel_type = travel_type
         self.next = None
 
+
 class Graph:
 
     def __init__(self, vertices):
@@ -326,11 +318,11 @@ class Graph:
 
     def BellmanFord(self, src, end):
         pred = [None] * self.V
-        # Step 1: fill the distance array and predecessor array
+        # fill the distance array and predecessor array
         dist = [float("Inf")] * self.V
         # Mark the source vertex
         dist[src] = 0
-
+        # flag = False
         # Step 2: relax edges |V| - 1 times
         for _ in range(self.V - 1):
             for s, d, w in self.graph:
@@ -338,19 +330,14 @@ class Graph:
                     dist[d] = dist[s] + w
                     pred[d] = s
 
-        # Step 3: detect negative cycle
+        # detect negative cycle
         # if value changes then we have a negative cycle in the graph
         # and we cannot find the shortest distances
         for s, d, w in self.graph:
             if dist[s] != float("Inf") and dist[s] + w < dist[d]:
                 print("Graph contains negative weight cycle")
-                return
+                return None
 
-        # No negative weight cycle found!
-        # Print the distance and predecessor array
-        #self.print_solution(dist)
-
-        #print(pred)
         temp = end
         route = [temp]  # Set route to end
 
@@ -359,8 +346,11 @@ class Graph:
             route.append(pred[temp])  # Append path to route list from predecessor array
             temp = pred[temp]  # update temp end
         route.reverse()  # Reverse list to get right order
-        #print(route)
+        if len(route) < 2:
+            return None
+
         return route
+
 
 def optimalRoute(downhillScores, start, finish):
     g = Graph(7)
@@ -369,25 +359,27 @@ def optimalRoute(downhillScores, start, finish):
     # # function call
     return g.BellmanFord(start, finish)
 
+
+# #
 # if __name__ == "__main__":
-    # roads = [(0, 1, 4), (0, 3, 2), (0, 2, 3), (2, 3, 2), (3, 0, 3)]
-    # cafes = [(0, 5), (3, 2), (1, 3)]
-    # roads = [(0, 1, 4), (1, 2, 2), (2, 3, 3), (3, 4, 1), (1, 5, 2),
-    #          (5, 6, 5), (6, 3, 2), (6, 4, 3), (1, 7, 4), (7, 8, 2),
-    #          (8, 7, 2), (7, 3, 2), (8, 0, 11), (4, 3, 1), (4, 8, 10)
-    #     , (5, 9, 1), (9, 10, 2), (10, 11, 3), (11, 12, 1)]
-    # cafes = [(5, 10), (6, 1), (7, 5), (0, 3), (8, 4)]
-    #
-    # road_graph = RoadGraph(roads, cafes)
-    #
-    # print(road_graph.routing(1,1))
-    # Example
-    # The scores you can obtain in each downhill segment
-    # downhillScores = [(0, 6, -500), (1, 4, 100), (1, 2, 300),
-    #                   (6, 3, -100), (6, 1, 200), (3, 4, 400), (3, 1, 400),
-    #                   (5, 6, 700), (5, 1, 1000), (4, 2, 100)]
-    # # The starting and finishing points
-    # start = 6
-    # finish = 2
-    # print(optimalRoute(downhillScores, start, finish))
-    # print([6, 3, 1, 2])
+#     # roads = [(0, 1, 4), (0, 3, 2), (0, 2, 3), (2, 3, 2), (3, 0, 3)]
+#     # cafes = [(0, 5), (3, 2), (1, 3)]
+#     # roads = [(0, 1, 4), (1, 2, 2), (2, 3, 3), (3, 4, 1), (1, 5, 2),
+#     #          (5, 6, 5), (6, 3, 2), (6, 4, 3), (1, 7, 4), (7, 8, 2),
+#     #          (8, 7, 2), (7, 3, 2), (8, 0, 11), (4, 3, 1), (4, 8, 10)
+#     #     , (5, 9, 1), (9, 10, 2), (10, 11, 3), (11, 12, 1)]
+#     # cafes = [(5, 10), (6, 1), (7, 5), (0, 3), (8, 4)]
+#     #
+#     # road_graph = RoadGraph(roads, cafes)
+#     #
+#     # print(road_graph.routing(1,1))
+#     # Example
+#     # The scores you can obtain in each downhill segment
+#     downhillScores = [(0, 6, -500), (1, 4, 100), (1, 2, 300),
+#                       (6, 3, -100), (6, 1, 200), (3, 4, 400), (3, 1, 400),
+#                       (5, 6, 700), (5, 1, 1000), (4, 2, 100)]
+#     # The starting and finishing points
+#     start = 6
+#     finish = 2
+#     print(optimalRoute(downhillScores, start, finish))
+#     print([6, 3, 1, 2])
