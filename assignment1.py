@@ -1,5 +1,3 @@
-### Rhyme Bulbul 31865224 ###
-#
 """
 References: Monash FIT2004 Week 2,3 Studio and Lecture Material
 https://www.youtube.com/watch?v=XiuSW_mEn7g
