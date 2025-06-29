@@ -3,8 +3,6 @@ Monash University
 FIT2004 - Algorithms and Data Structures
 Assignment 3
 
-Rhyme Bulbul
-31865224
 
 References:
     1. Wikimedia Foundation. (2022, August 4). Flow network. Wikipedia. Retrieved October 19, 2022, from https://en.wikipedia.org/wiki/Flow_network
