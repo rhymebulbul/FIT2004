@@ -1,9 +1,7 @@
 """
     Monash University
     FIT2004 - Algorithms and Data Structures
-    Rhyme Bulbul
-    Student Number 31865224
-
+    
     References:
         1. FIT2004 course notes
         2. FIT2004 week 4, 5, 6 lecture material
