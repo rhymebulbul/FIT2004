@@ -1,13 +1,5 @@
 """
-Monash University
-FIT2004 - Algorithms and Data Structures
-Assignment 3
-
-Rhyme Bulbul
-31865224
-
-References:
-    1.
+Find out
 """
 import math
 
